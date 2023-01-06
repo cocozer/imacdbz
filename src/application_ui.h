@@ -22,15 +22,15 @@ struct Vector2 {
     void writeVector2(int x, int y);
 };
 struct Vector3 {
-    int r;
-    int g;
-    int b;
+    unsigned int r;
+    unsigned int g;
+    unsigned int b;
 
     int returnr();
     int returng();
     int returnb();
     // Assignation des valeurs dans l'objet crée
-    void writeVector3(int r, int g, int b);
+    void writeVector3(unsigned int r, unsigned int g, unsigned int b);
 };
 struct Wall {
     int x1;
@@ -47,7 +47,7 @@ struct Ball {
     Vector3 color;
     Vector3 bordercolor;
     // Assignation des valeurs dans l'objet crée
-    void writeBall(int x, int y, int vx, int vy, int rx, int ry, int r, int g, int b, int br, int bg, int bb);
+    void writeBall(int x, int y, int vx, int vy, int rx, int ry, unsigned int r, unsigned int g, unsigned int b, unsigned int br, unsigned int bg, unsigned int bb);
     // On dessine les balles à l'endroit où elles sont à l'instant T
     void draw(SDL_Renderer* renderer);
     // On update la position des balles en fonction de la vélocité

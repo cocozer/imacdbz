@@ -37,7 +37,7 @@ int Vector3::returnb()
     return this->b;
 }
 
-void Vector3::writeVector3(int r, int g, int b){
+void Vector3::writeVector3(unsigned int r, unsigned int g, unsigned int b){
     this->r = r;
     this->g = g;
     this->b = b;
@@ -50,7 +50,7 @@ void Wall::writeWall(int x1, int y1, int x2, int y2){
     this->y2 = y2;
 }
 // STRUCT BALL FONCTIONS
-void Ball::writeBall(int x, int y, int vx, int vy, int rx, int ry, int r, int g, int b, int br, int bg, int bb){
+void Ball::writeBall(int x, int y, int vx, int vy, int rx, int ry, unsigned int r, unsigned int g, unsigned int b, unsigned int br, unsigned int bg, unsigned int bb){
     this->position.writeVector2(x, y);
     this->velocity.writeVector2(vx, vy);
     this->radius.writeVector2(rx, ry);
@@ -115,7 +115,7 @@ int main(int argc, char** argv) {
 
         // Initialisation des acteurs
         Ball balle1;
-        balle1.writeBall(50, 50, 3, 1, 15, 15, 255, 0, 100, 255, 255, 255);
+        balle1.writeBall(50, 50, 11, 4, 15, 15, 255, 0, 100, 255, 255, 255);
         Wall wall;
         wall.writeWall(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     /*  GAME LOOP  */
