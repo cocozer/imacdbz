@@ -43,7 +43,12 @@ void Vector3::writeVector3(int r, int g, int b){
     this->b = b;
 }
 
-
+void Wall::writeWall(int x1, int y1, int x2, int y2){
+    this->x1 = x1;
+    this->x2 = x2;
+    this->y1 = y1;
+    this->y2 = y2;
+}
 // STRUCT BALL FONCTIONS
 void Ball::writeBall(int x, int y, int vx, int vy, int rx, int ry, int r, int g, int b, int br, int bg, int bb){
     this->position.writeVector2(x, y);
@@ -67,16 +72,16 @@ void Ball::updatePosition(){
     this->position.x+=this->velocity.x;
     this->position.y+=this->velocity.y;
 }
-void Ball::checkWalls(int SCREEN_WIDTH, int SCREEN_HEIGHT){
+void Ball::checkWalls(Wall wall){
 
     // Si la balle touche un bord, sa vitesse est inversée
-    if (this->position.x - this->radius.x <= 0) {
+    if (this->position.x - this->radius.x <= wall.x1) {
         this->velocity.x = - this->velocity.x;
-    } else if (this->position.y - this->radius.x <= 0) {
+    } else if (this->position.y - this->radius.y <= wall.y1) {
         this->velocity.y = -this->velocity.y;
-    } else if (this->position.x + this->radius.x >= SCREEN_WIDTH) {
+    } else if (this->position.x + this->radius.x >= wall.x2) {
         this->velocity.x = - this->velocity.x;
-    }   else if (this->position.y + this->radius.x >= SCREEN_HEIGHT) {
+    }   else if (this->position.y + this->radius.y >= wall.y2) {
         this->velocity.y = - this->velocity.y;
     }
 }
@@ -111,6 +116,8 @@ int main(int argc, char** argv) {
         // Initialisation des acteurs
         Ball balle1;
         balle1.writeBall(50, 50, 3, 1, 15, 15, 255, 0, 100, 255, 255, 255);
+        Wall wall;
+        wall.writeWall(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     /*  GAME LOOP  */
     
     while(true)
@@ -121,7 +128,7 @@ int main(int argc, char** argv) {
             break;
 
         // GESTION ACTEURS
-        balle1.checkWalls(SCREEN_WIDTH, SCREEN_HEIGHT);
+        balle1.checkWalls(wall);
         balle1.updatePosition();
         // ...
         

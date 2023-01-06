@@ -32,7 +32,14 @@ struct Vector3 {
     // Assignation des valeurs dans l'objet crée
     void writeVector3(int r, int g, int b);
 };
+struct Wall {
+    int x1;
+    int x2;
+    int y1;
+    int y2;
 
+    void writeWall(int x1, int y1, int x2, int y2);
+};
 struct Ball {
     Vector2 position;
     Vector2 velocity;
@@ -46,7 +53,7 @@ struct Ball {
     // On update la position des balles en fonction de la vélocité
     void updatePosition();
     // On vérifie si la balle touche les murs, si oui, on la fait changer de sens
-    void checkWalls(int SCREEN_WIDTH, int SCREEN_HEIGHT);
+    void checkWalls(Wall wall);
 };
 #endif
 
