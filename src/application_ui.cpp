@@ -55,3 +55,5 @@ void close(SDL_Window* gWindow, SDL_Renderer* renderer)
     //Quit SDL subsystems
     SDL_Quit();
 }
+
+
