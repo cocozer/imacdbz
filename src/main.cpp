@@ -1,7 +1,6 @@
 #include "application_ui.h"
 #include "SDL2_gfxPrimitives.h"
 
-
 // STRUCT VECTOR 2 FONCTIONS
 
 int Vector2::returnx()
@@ -48,8 +47,8 @@ void Vector3::writeVector3(int r, int g, int b){
 // STRUCT BALL FONCTIONS
 void Ball::writeBall(int x, int y, int vx, int vy, int rx, int ry, int r, int g, int b, int br, int bg, int bb){
     this->position.writeVector2(x, y);
-    this->velocity.writeVector2(x, y);
-    this->radius.writeVector2(x, y);
+    this->velocity.writeVector2(vx, vy);
+    this->radius.writeVector2(rx, ry);
     this->color.writeVector3(r, g, b);
     this->bordercolor.writeVector3(br, bg, bb);
 }
@@ -63,6 +62,10 @@ void Ball::draw(SDL_Renderer* renderer)
     /*SDL2_GFXPRIMITIVES_SCOPE int filledEllipseRGBA(SDL_Renderer * renderer, Sint16 x, Sint16 y,
 		Sint16 rx, Sint16 ry, Uint8 r, Uint8 g, Uint8 b, Uint8 a);*/
    
+}
+void Ball::updatePosition(){
+    this->position.x+=this->velocity.x;
+    this->position.y+=this->velocity.y;
 }
 
 bool handleEvent()
@@ -93,7 +96,11 @@ int main(int argc, char** argv) {
 
     renderer = SDL_CreateRenderer(gWindow, -1, 0); // SDL_RENDERER_PRESENTVSYNC
 
+        // Initialisation des acteurs
+        Ball balle1;
+        balle1.writeBall(50, 50, 3, 1, 15, 15, 255, 0, 100, 255, 255, 255);
     /*  GAME LOOP  */
+    
     while(true)
     {
         // INPUTS
@@ -102,7 +109,7 @@ int main(int argc, char** argv) {
             break;
 
         // GESTION ACTEURS
-
+        balle1.updatePosition();
         // ...
         
         // EFFACAGE FRAME
@@ -110,8 +117,6 @@ int main(int argc, char** argv) {
         SDL_RenderClear(renderer);
         
         // DESSIN
-        Ball balle1;
-        balle1.writeBall(50, 50, 3, 1, 15, 15, 255, 0, 100, 255, 255, 255);
         balle1.draw(renderer);
 
         // VALIDATION FRAME

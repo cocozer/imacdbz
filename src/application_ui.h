@@ -43,6 +43,8 @@ struct Ball {
     void writeBall(int x, int y, int vx, int vy, int rx, int ry, int r, int g, int b, int br, int bg, int bb);
     // On dessine les balles à l'endroit où elles sont à l'instant T
     void draw(SDL_Renderer* renderer);
+    // On update la position des balles en fonction de la vélocité
+    void updatePosition();
 
 };
 #endif
