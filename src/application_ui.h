@@ -45,7 +45,8 @@ struct Ball {
     void draw(SDL_Renderer* renderer);
     // On update la position des balles en fonction de la vélocité
     void updatePosition();
-
+    // On vérifie si la balle touche les murs, si oui, on la fait changer de sens
+    void checkWalls(int SCREEN_WIDTH, int SCREEN_HEIGHT);
 };
 #endif
 

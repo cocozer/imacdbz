@@ -67,7 +67,19 @@ void Ball::updatePosition(){
     this->position.x+=this->velocity.x;
     this->position.y+=this->velocity.y;
 }
+void Ball::checkWalls(int SCREEN_WIDTH, int SCREEN_HEIGHT){
 
+    // Si la balle touche un bord, sa vitesse est inversée
+    if (this->position.x - this->radius.x <= 0) {
+        this->velocity.x = - this->velocity.x;
+    } else if (this->position.y - this->radius.x <= 0) {
+        this->velocity.y = -this->velocity.y;
+    } else if (this->position.x + this->radius.x >= SCREEN_WIDTH) {
+        this->velocity.x = - this->velocity.x;
+    }   else if (this->position.y + this->radius.x >= SCREEN_HEIGHT) {
+        this->velocity.y = - this->velocity.y;
+    }
+}
 bool handleEvent()
 {
     /* Remplissez cette fonction pour gérer les inputs utilisateurs */
@@ -109,6 +121,7 @@ int main(int argc, char** argv) {
             break;
 
         // GESTION ACTEURS
+        balle1.checkWalls(SCREEN_WIDTH, SCREEN_HEIGHT);
         balle1.updatePosition();
         // ...
         
