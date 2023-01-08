@@ -11,6 +11,8 @@ SDL_Window* init(std::string windowTitle);
 SDL_Surface* loadMedia(std::string path);
 void close(SDL_Window* gWindow, SDL_Renderer* renderer);
 
+// Fonctions
+int randomNumber(int min, int max);
 // Création de vecteurs pour pouvoir stocker les informations doubles et triples (par exemple, la position, la vitesse, le rayon, la couleur en RGB)
 struct Vector2 {
     int x;
@@ -47,7 +49,7 @@ struct Ball {
     Vector3 color;
     Vector3 bordercolor;
     // Assignation des valeurs dans l'objet crée
-    void writeBall(int x, int y, int vx, int vy, int rx, int ry, unsigned int r, unsigned int g, unsigned int b, unsigned int br, unsigned int bg, unsigned int bb);
+    void writeBall(int x, int y, int vx, int vy, int rayon, unsigned int r, unsigned int g, unsigned int b, unsigned int br, unsigned int bg, unsigned int bb);
     // On dessine les balles à l'endroit où elles sont à l'instant T
     void draw(SDL_Renderer* renderer);
     // On update la position des balles en fonction de la vélocité

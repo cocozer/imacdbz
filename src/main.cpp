@@ -1,6 +1,14 @@
 #include "application_ui.h"
 #include "SDL2_gfxPrimitives.h"
+#include <iostream>
+#include <ctime>
+#include <cstdlib>
+using namespace std;
+// Fonctions
 
+int randomNumber(int min, int max){
+        return min + (rand() % max); 
+}
 // STRUCT VECTOR 2 FONCTIONS
 
 int Vector2::returnx()
@@ -50,10 +58,10 @@ void Wall::writeWall(int x1, int y1, int x2, int y2){
     this->y2 = y2;
 }
 // STRUCT BALL FONCTIONS
-void Ball::writeBall(int x, int y, int vx, int vy, int rx, int ry, unsigned int r, unsigned int g, unsigned int b, unsigned int br, unsigned int bg, unsigned int bb){
+void Ball::writeBall(int x, int y, int vx, int vy, int rayon, unsigned int r, unsigned int g, unsigned int b, unsigned int br, unsigned int bg, unsigned int bb){
     this->position.writeVector2(x, y);
     this->velocity.writeVector2(vx, vy);
-    this->radius.writeVector2(rx, ry);
+    this->radius.writeVector2(rayon, rayon);
     this->color.writeVector3(r, g, b);
     this->bordercolor.writeVector3(br, bg, bb);
 }
@@ -95,6 +103,20 @@ bool handleEvent()
     }
     return true;
 }
+// bool handleEvent()
+// {
+//     /* Remplissez cette fonction pour gérer les inputs utilisateurs */
+//     SDL_Event e; 
+//     while (SDL_PollEvent(&e)){ 
+//         switch (e.type) {
+//             case SDL_MouseButtonEvent:
+            
+//                 break;
+//         }
+//             return false;
+//     }
+//     return true;
+// }
 
 
 int main(int argc, char** argv) {
@@ -114,8 +136,20 @@ int main(int argc, char** argv) {
     renderer = SDL_CreateRenderer(gWindow, -1, 0); // SDL_RENDERER_PRESENTVSYNC
 
         // Initialisation des acteurs
-        Ball balle1;
-        balle1.writeBall(50, 50, 11, 4, 15, 15, 255, 0, 100, 255, 255, 255);
+
+            // Initialisation des balles
+
+                // Initialisation du tableau de balles
+                int nbBalles = 5;
+                Ball balles[nbBalles];
+                // Initialisation des balles et insertion des balles dans le tableau
+                for(int i=0; i<nbBalles; i++){
+                    Ball balle;
+                    balle.writeBall(randomNumber(20, 700), randomNumber(20, 460), randomNumber(1, 7), randomNumber(1, 7), randomNumber(10, 20), 110, 150, 30, 255, 255, 255);
+                    balles[i] = balle;
+                }
+                
+            // Initialisations des murs
         Wall wall;
         wall.writeWall(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     /*  GAME LOOP  */
@@ -128,8 +162,11 @@ int main(int argc, char** argv) {
             break;
 
         // GESTION ACTEURS
-        balle1.checkWalls(wall);
-        balle1.updatePosition();
+        for(int i=0; i<nbBalles; i++){
+            balles[i].checkWalls(wall);
+            balles[i].updatePosition();
+        }
+
         // ...
         
         // EFFACAGE FRAME
@@ -137,7 +174,10 @@ int main(int argc, char** argv) {
         SDL_RenderClear(renderer);
         
         // DESSIN
-        balle1.draw(renderer);
+        for(int i=0; i<nbBalles; i++){
+            balles[i].draw(renderer);
+        }
+        
 
         // VALIDATION FRAME
         SDL_RenderPresent(renderer);
