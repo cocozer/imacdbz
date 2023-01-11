@@ -58,12 +58,13 @@ void Wall::writeWall(int x1, int y1, int x2, int y2){
     this->y2 = y2;
 }
 // STRUCT BALL FONCTIONS
-void Ball::writeBall(int x, int y, int vx, int vy, int rayon, unsigned int r, unsigned int g, unsigned int b, unsigned int br, unsigned int bg, unsigned int bb){
+void Ball::writeBall(int x, int y, int vx, int vy, int rayon, unsigned int r, unsigned int g, unsigned int b, unsigned int br, unsigned int bg, unsigned int bb, bool active){
     this->position.writeVector2(x, y);
     this->velocity.writeVector2(vx, vy);
     this->radius.writeVector2(rayon, rayon);
     this->color.writeVector3(r, g, b);
     this->bordercolor.writeVector3(br, bg, bb);
+    this->active = active;
 }
 void Ball::draw(SDL_Renderer* renderer)
 {
@@ -93,15 +94,97 @@ void Ball::checkWalls(Wall wall){
         this->velocity.y = - this->velocity.y;
     }
 }
-bool handleEvent()
-{
-    /* Remplissez cette fonction pour gérer les inputs utilisateurs */
-    SDL_Event e; 
-    while (SDL_PollEvent(&e)){ 
-        if (e.type == SDL_QUIT) 
-            return false; 
+Ball *newBall(Ball *list) {
+    Ball *new_ball=new Ball;
+    if (new_ball==nullptr) {
+        cout << "Memory run out." << endl;
+        exit(1);
     }
-    return true;
+    new_ball->position.x=randomNumber(30, 690);
+    new_ball->position.y=randomNumber(30, 410);
+    new_ball->velocity.x=randomNumber(1, 7);
+    new_ball->velocity.y=randomNumber(1, 7);
+    int radius = randomNumber(10, 20);
+    new_ball->radius.x=radius;
+    new_ball->radius.y=radius;
+    new_ball->color.r=110;
+    new_ball->color.g=150;
+    new_ball->color.b=30;
+    new_ball->bordercolor.r=255;
+    new_ball->bordercolor.g=255;
+    new_ball->bordercolor.b=255;
+    new_ball->active=1;
+    new_ball->next=nullptr;
+    if (list!=nullptr) {
+        find_last(list)->next=new_ball;
+        return list;
+    }
+    else return new_ball;
+}
+
+Ball *find_last(Ball *list) {
+    while (list->next!=nullptr) {
+        list=list->next;
+    }
+    return list;
+}
+
+
+
+void handleEvent(Ball *balls) {
+    
+    /* Définition des variables de position de curseur */
+    int  xMouse;
+    int  yMouse;
+        // Condition de clic
+    if(SDL_GetMouseState(NULL, NULL)&SDL_BUTTON(1)) { // lors d'un clic
+        // Capture les positions du curseur à l'instant du clic
+        SDL_GetMouseState(&xMouse,&yMouse);
+        int position = 0;
+        while (balls->next!=nullptr) {
+        // for (int i = 0; i<nbBalles;i++){
+
+        // // Au lieu de prendre simplement la position, on divise les valeurs par le rayon pour pouvoir cliquer sur une balle en cliquant sur n'importe quel endroit de sa surface
+        // int yMouseDividedByRadius = yMouse / balles[i].radius.y;
+        // int xMouseDividedByRadius = xMouse / balles[i].radius.x;
+        // int yBallPositionDividedByRadius = balles[i].position.y / balles[i].radius.y;
+        // int xBallPositionDividedByRadius = balles[i].position.x / balles[i].radius.x;
+        
+            if (yMouse > balls->position.y - balls->radius.y && yMouse < balls->position.y + balls->radius.y && xMouse > balls->position.x - balls->radius.x && xMouse < balls->position.x + balls->radius.x){
+                // Si on clique sur une balle, on change le next de sa précédente en le next de sa suivante
+                int increment = 0;
+                
+                while(position != 1){
+                    if (increment == position-1){
+                        balls->next = balls->next->next;
+                    }
+                    increment++;
+                }
+                if (position == 1) {
+                    *balls = *balls->next;
+                }
+                
+            }
+        // }
+        position++;
+        balls = balls->next;
+        }
+    }
+}
+
+void move(Ball *balls, Wall wall) {
+        while (balls->next!=nullptr) {
+        balls->checkWalls(wall);
+        balls->updatePosition();
+        balls = balls->next;
+    }
+}
+
+void draw(Ball *balls, SDL_Renderer* renderer) {
+        while (balls->next!=nullptr) {
+            balls->draw(renderer);
+        }
+    balls = balls->next;
 }
 // bool handleEvent()
 // {
@@ -140,15 +223,17 @@ int main(int argc, char** argv) {
             // Initialisation des balles
 
                 // Initialisation du tableau de balles
-                int nbBalles = 5;
-                Ball balles[nbBalles];
+                int nbBalles = 15;
+                Ball *balls = nullptr;
+                // Ball balles;
                 // Initialisation des balles et insertion des balles dans le tableau
                 for(int i=0; i<nbBalles; i++){
-                    Ball balle;
-                    balle.writeBall(randomNumber(20, 700), randomNumber(20, 460), randomNumber(1, 7), randomNumber(1, 7), randomNumber(10, 20), 110, 150, 30, 255, 255, 255);
-                    balles[i] = balle;
+                    // Ball balls;
+                    // balls.writeBall(randomNumber(30, 690), randomNumber(30, 410), randomNumber(1, 7), randomNumber(1, 7), randomNumber(10, 20), 110, 150, 30, 255, 255, 255, 1);
+                    balls = newBall(balls);
+                    // balles[i] = balle;
                 }
-                
+
             // Initialisations des murs
         Wall wall;
         wall.writeWall(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -157,16 +242,18 @@ int main(int argc, char** argv) {
     while(true)
     {
         // INPUTS
-        is_running = handleEvent();
-        if (!is_running)
+        // is_running = handleEvent(&balles[nbBalles], nbBalles);
+        if (!is_running) {
             break;
+        }
+        handleEvent(balls);
 
         // GESTION ACTEURS
-        for(int i=0; i<nbBalles; i++){
-            balles[i].checkWalls(wall);
-            balles[i].updatePosition();
-        }
-
+        // for(int i=0; i<nbBalles; i++){
+        //     balles[i].checkWalls(wall);
+        //     balles[i].updatePosition();
+        // }
+        move(balls);
         // ...
         
         // EFFACAGE FRAME
@@ -174,9 +261,8 @@ int main(int argc, char** argv) {
         SDL_RenderClear(renderer);
         
         // DESSIN
-        for(int i=0; i<nbBalles; i++){
-            balles[i].draw(renderer);
-        }
+        draw(balls, renderer);
+
         
 
         // VALIDATION FRAME
@@ -184,6 +270,8 @@ int main(int argc, char** argv) {
 
         // PAUSE en ms
         SDL_Delay(1000/30); 
+
+        // temporaire off de runing
     }
 
     //Free resources and close SDL
