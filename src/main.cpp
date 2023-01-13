@@ -145,7 +145,7 @@ int main(int argc, char** argv) {
                 // Initialisation des balles et insertion des balles dans le tableau
                 for(int i=0; i<nbBalles; i++){
                     Ball balle;
-                    balle.writeBall(randomNumber(20, 700), randomNumber(20, 460), randomNumber(1, 7), randomNumber(1, 7), randomNumber(10, 20), 110, 150, 30, 255, 255, 255);
+                    balle.writeBall(randomNumber(30, 700), randomNumber(20, 460), randomNumber(1, 7), randomNumber(1, 7), randomNumber(10, 20), 110, 150, 30, 255, 255, 255);
                     balles[i] = balle;
                 }
                 
