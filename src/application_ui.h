@@ -65,6 +65,7 @@ typedef struct Ball {
 //Création d'une nouvelle balle et ajout dans la liste chainée
 Ball *newBall(Ball *list);
 Ball *newBallWithPos(Ball *list, int x, int y);
+Ball *newBallWithColor(Ball *list, int r, int g, int b);
 void handleEvent(Ball *balls);
 Ball *find_last(Ball *list);
 

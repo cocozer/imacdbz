@@ -113,14 +113,65 @@ Ball *newBallWithPos(Ball *list, int x, int y) {
     }
     new_ball->position.x = x;
     new_ball->position.y = y;
-    new_ball->velocity.x = randomNumber(1, 7);
-    new_ball->velocity.y = randomNumber(1, 7);
+
+    // Première génération d'un nombre aléatoire pour décider si la vélocité sera positive ou négative
+    // Puis ensuite, si c'est négatif on génère une vélocité négative. sinon positive.
+    if (randomNumber(0, 1) == 0) {
+        new_ball->velocity.x = randomNumber(-7, 7);
+    }   else {
+        new_ball->velocity.x = randomNumber(7, 7);
+    }
+    if (randomNumber(0, 1) == 0) {
+        new_ball->velocity.y = randomNumber(-7, 7);
+    }   else {
+        new_ball->velocity.y = randomNumber(7, 7);
+    }
     int radius = randomNumber(10, 20);
     new_ball->radius.x = radius;
     new_ball->radius.y = radius;
     new_ball->color.r = 110;
     new_ball->color.g = 150;
     new_ball->color.b = 30;
+    new_ball->bordercolor.r = 255;
+    new_ball->bordercolor.g = 255;
+    new_ball->bordercolor.b = 255;
+    new_ball->next = nullptr;
+    if (list != nullptr)
+    {
+        find_last(list)->next = new_ball;
+        return list;
+    }
+    else
+        return new_ball;
+}
+Ball *newBallWithColor(Ball *list, int r, int g, int b) {
+    Ball *new_ball = new Ball;
+    if (new_ball == nullptr)
+    {
+        cout << "Memory run out." << endl;
+        exit(1);
+    }
+    new_ball->position.x = randomNumber(30, 690);
+    new_ball->position.y = randomNumber(30, 410);
+
+    // Première génération d'un nombre aléatoire pour décider si la vélocité sera positive ou négative
+    // Puis ensuite, si c'est négatif on génère une vélocité négative. sinon positive.
+    if (randomNumber(0, 1) == 0) {
+        new_ball->velocity.x = randomNumber(-7, 7);
+    }   else {
+        new_ball->velocity.x = randomNumber(7, 7);
+    }
+    if (randomNumber(0, 1) == 0) {
+        new_ball->velocity.y = randomNumber(-7, 7);
+    }   else {
+        new_ball->velocity.y = randomNumber(7, 7);
+    }
+    int radius = randomNumber(10, 20);
+    new_ball->radius.x = radius;
+    new_ball->radius.y = radius;
+    new_ball->color.r = r;
+    new_ball->color.g = g;
+    new_ball->color.b = b;
     new_ball->bordercolor.r = 255;
     new_ball->bordercolor.g = 255;
     new_ball->bordercolor.b = 255;
@@ -143,8 +194,18 @@ Ball *newBall(Ball *list)
     }
     new_ball->position.x = randomNumber(30, 690);
     new_ball->position.y = randomNumber(30, 410);
-    new_ball->velocity.x = randomNumber(1, 7);
-    new_ball->velocity.y = randomNumber(1, 7);
+    // Première génération d'un nombre aléatoire pour décider si la vélocité sera positive ou négative
+    // Puis ensuite, si c'est négatif on génère une vélocité négative. sinon positive.
+    if (randomNumber(0, 1) == 0) {
+        new_ball->velocity.x = -randomNumber(1, 7);
+    }   else {
+        new_ball->velocity.x = randomNumber(1, 7);
+    }
+    if (randomNumber(0, 1) == 0) {
+        new_ball->velocity.y = -randomNumber(1, 7);
+    }   else {
+        new_ball->velocity.y = randomNumber(1, 7);
+    }
     int radius = randomNumber(10, 20);
     new_ball->radius.x = radius;
     new_ball->radius.y = radius;
@@ -272,11 +333,12 @@ void handleEvent(Ball **balls)
 
 void moveBalls(Ball *balls, Wall wall)
 {
-    while (balls->next != nullptr)
+    Ball *current = balls;
+    while (current != nullptr)
     {
-        balls->checkWalls(wall);
-        balls->updatePosition();
-        balls = balls->next;
+        current->checkWalls(wall);
+        current->updatePosition();
+        current = current->next;
     }
 }
 
@@ -287,6 +349,7 @@ void draw(Ball *balls, SDL_Renderer *renderer)
         balls->draw(renderer);
         balls = balls->next;
     }
+    balls->draw(renderer);
 }
 // bool handleEvent()
 // {
@@ -323,17 +386,28 @@ int main(int argc, char **argv)
 
     // Initialisation des balles
 
-    // Initialisation du tableau de balles
-    int nbBalles = 5;
+    // Initialisation des balles
     Ball *balls = nullptr;
-    // Ball balles;
-    // Initialisation des balles et insertion des balles dans le tableau
+        int nbBalles = 5;
+    if (argc == 2) {
+        int arg = atoi(argv[1]);
+        if (arg > 0) {
+            nbBalles = arg;
+        }
+    } else if (argc > 2) {
+        for (int i = 1; i < argc; i++){
+            int r;
+            int g;
+            int b;
+            sscanf(argv[i], "%d,%d,%d", &r, &g, &b);
+            balls = newBallWithColor(balls, r, g, b);
+        }
+        nbBalles = 0;
+    }
+
     for (int i = 0; i < nbBalles; i++)
     {
-        // Ball balls;
-        // balls.writeBall(randomNumber(30, 690), randomNumber(30, 410), randomNumber(1, 7), randomNumber(1, 7), randomNumber(10, 20), 110, 150, 30, 255, 255, 255);
         balls = newBall(balls);
-        // balles[i] = balle;
     }
 
     // Initialisations des murs
