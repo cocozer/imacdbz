@@ -146,7 +146,7 @@ Ball *find_last(Ball *list)
     return list;
 }
 
-void handleEvent(Ball *balls)
+void handleEvent(Ball **balls)
 {
 
     /* Définition des variables de position de curseur */
@@ -157,14 +157,16 @@ void handleEvent(Ball *balls)
     {
 
     }
+    Ball *previous = nullptr;
+    Ball *current = *balls;
     // Condition de clic
     if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(1))
     { // lors d'un clic
         // Capture les positions du curseur à l'instant du clic
         SDL_GetMouseState(&xMouse, &yMouse);
-        int position = 0;
-        while (balls->next != nullptr)
+        while (current != nullptr)
         {
+            
             // for (int i = 0; i<nbBalles;i++){
 
             // // Au lieu de prendre simplement la position, on divise les valeurs par le rayon pour pouvoir cliquer sur une balle en cliquant sur n'importe quel endroit de sa surface
@@ -173,29 +175,25 @@ void handleEvent(Ball *balls)
             // int yBallPositionDividedByRadius = balles[i].position.y / balles[i].radius.y;
             // int xBallPositionDividedByRadius = balles[i].position.x / balles[i].radius.x;
 
-            if (yMouse > balls->position.y - balls->radius.y && yMouse < balls->position.y + balls->radius.y && xMouse > balls->position.x - balls->radius.x && xMouse < balls->position.x + balls->radius.x)
+            if (yMouse > current->position.y - current->radius.y && yMouse < current->position.y + current->radius.y && xMouse > current->position.x - current->radius.x && xMouse < current->position.x + current->radius.x)
             {
                 // Si on clique sur une balle, on change le next de sa précédente en le next de sa suivante
-                int increment = 0;
+                // On reparcourt toutes les balles pour revenir à la balle d'avant mais on vérifie aussi que l'utilisateur n'a pas cliqué sur la première balle
+               
+                
+                if (previous == nullptr) {
+                    *balls = current->next;
+                } else if (find_last(*balls) == current) {
 
-                while (position != 1)
-                {
-                    if (increment == position - 1)
-                    {
-                        balls->next = balls->next->next;
-                    }
-                    increment++;
+                    previous->next = nullptr;
+                } else {
+                    previous->next = current->next;
                 }
-                if (position == 1)
-                {
-                    *balls = *balls->next;
-                }
+                break;
             }
             // }
-            SDL_Log("%d \n", 10);
-            position++;
-            SDL_Log("%d \n", 11);
-            balls = balls->next;
+            previous = current;
+            current = current->next;
         }
     }
 }
@@ -279,8 +277,7 @@ int main(int argc, char **argv)
         {
             break;
         }
-        SDL_Log("%d \n", 10);
-        handleEvent(balls);
+        handleEvent(&balls);
         // GESTION ACTEURS
         // for(int i=0; i<nbBalles; i++){
         //     balles[i].checkWalls(wall);
