@@ -163,6 +163,7 @@ void handleEvent(Ball **balls)
     if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(1))
     { // lors d'un clic
         // Capture les positions du curseur à l'instant du clic
+        bool clickedonball = false;
         SDL_GetMouseState(&xMouse, &yMouse);
         while (current != nullptr)
         {
@@ -177,10 +178,8 @@ void handleEvent(Ball **balls)
 
             if (yMouse > current->position.y - current->radius.y && yMouse < current->position.y + current->radius.y && xMouse > current->position.x - current->radius.x && xMouse < current->position.x + current->radius.x)
             {
-                // Si on clique sur une balle, on change le next de sa précédente en le next de sa suivante
-                // On reparcourt toutes les balles pour revenir à la balle d'avant mais on vérifie aussi que l'utilisateur n'a pas cliqué sur la première balle
-               
-                
+               //L'utilisateur a cliqué sur la balle
+                clickedonball = true;
                 if (previous == nullptr) {
                     *balls = current->next;
                 } else if (find_last(*balls) == current) {
@@ -190,10 +189,15 @@ void handleEvent(Ball **balls)
                     previous->next = current->next;
                 }
                 break;
-            }
+            } 
             // }
             previous = current;
             current = current->next;
+        }
+        // Si l'utilisateur n'a pas cliqué sur la balle, on crée une nouvelle balle
+        bool ballspawned = false;
+        if (clickedonball == false && ballspawned == false) {
+            *balls = newBall(*balls);
         }
     }
 }
@@ -238,7 +242,7 @@ int main(int argc, char **argv)
     bool is_running = true;
 
     // Creation de la fenetre
-    gWindow = init("Awesome Game");
+    gWindow = init("dbzimac (attrape toutes les boules de cristal)");
 
     if (!gWindow)
     {
@@ -252,7 +256,7 @@ int main(int argc, char **argv)
     // Initialisation des balles
 
     // Initialisation du tableau de balles
-    int nbBalles = 15;
+    int nbBalles = 5;
     Ball *balls = nullptr;
     // Ball balles;
     // Initialisation des balles et insertion des balles dans le tableau
