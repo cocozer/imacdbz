@@ -42,20 +42,32 @@ struct Wall {
 
     void writeWall(int x1, int y1, int x2, int y2);
 };
-struct Ball {
+typedef struct Ball {
     Vector2 position;
     Vector2 velocity;
     Vector2 radius;
     Vector3 color;
     Vector3 bordercolor;
+    Ball *next;
+
+    bool active;
     // Assignation des valeurs dans l'objet crée
-    void writeBall(int x, int y, int vx, int vy, int rayon, unsigned int r, unsigned int g, unsigned int b, unsigned int br, unsigned int bg, unsigned int bb);
+    void writeBall(int x, int y, int vx, int vy, int rayon, unsigned int r, unsigned int g, unsigned int b, unsigned int br, unsigned int bg, unsigned int bb, bool active);
+    // On ajoute une nouvelle balle à la liste chainée
     // On dessine les balles à l'endroit où elles sont à l'instant T
     void draw(SDL_Renderer* renderer);
     // On update la position des balles en fonction de la vélocité
     void updatePosition();
     // On vérifie si la balle touche les murs, si oui, on la fait changer de sens
     void checkWalls(Wall wall);
-};
+
+} Ball;
+//Création d'une nouvelle balle et ajout dans la liste chainée
+Ball *newBall(Ball *list);
+void handleEvent(Ball *balls);
+Ball *find_last(Ball *list);
+
+void move(Ball *Balls, Wall wall);
+void draw(Ball *Balls, SDL_Renderer* renderer);
 #endif
 
