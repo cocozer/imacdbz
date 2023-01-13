@@ -67,7 +67,7 @@ Ball *newBall(Ball *list);
 void handleEvent(Ball *balls);
 Ball *find_last(Ball *list);
 
-void move(Ball *Balls, Wall wall);
+void moveBalls(Ball *Balls, Wall wall);
 void draw(Ball *Balls, SDL_Renderer* renderer);
 #endif
 
