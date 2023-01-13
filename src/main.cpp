@@ -60,14 +60,13 @@ void Wall::writeWall(int x1, int y1, int x2, int y2)
     this->y2 = y2;
 }
 // STRUCT BALL FONCTIONS
-void Ball::writeBall(int x, int y, int vx, int vy, int rayon, unsigned int r, unsigned int g, unsigned int b, unsigned int br, unsigned int bg, unsigned int bb, bool active)
+void Ball::writeBall(int x, int y, int vx, int vy, int rayon, unsigned int r, unsigned int g, unsigned int b, unsigned int br, unsigned int bg, unsigned int bb)
 {
     this->position.writeVector2(x, y);
     this->velocity.writeVector2(vx, vy);
     this->radius.writeVector2(rayon, rayon);
     this->color.writeVector3(r, g, b);
     this->bordercolor.writeVector3(br, bg, bb);
-    this->active = active;
 }
 void Ball::draw(SDL_Renderer *renderer)
 {
@@ -105,6 +104,35 @@ void Ball::checkWalls(Wall wall)
         this->velocity.y = -this->velocity.y;
     }
 }
+Ball *newBallWithPos(Ball *list, int x, int y) {
+    Ball *new_ball = new Ball;
+    if (new_ball == nullptr)
+    {
+        cout << "Memory run out." << endl;
+        exit(1);
+    }
+    new_ball->position.x = x;
+    new_ball->position.y = y;
+    new_ball->velocity.x = randomNumber(1, 7);
+    new_ball->velocity.y = randomNumber(1, 7);
+    int radius = randomNumber(10, 20);
+    new_ball->radius.x = radius;
+    new_ball->radius.y = radius;
+    new_ball->color.r = 110;
+    new_ball->color.g = 150;
+    new_ball->color.b = 30;
+    new_ball->bordercolor.r = 255;
+    new_ball->bordercolor.g = 255;
+    new_ball->bordercolor.b = 255;
+    new_ball->next = nullptr;
+    if (list != nullptr)
+    {
+        find_last(list)->next = new_ball;
+        return list;
+    }
+    else
+        return new_ball;
+}
 Ball *newBall(Ball *list)
 {
     Ball *new_ball = new Ball;
@@ -126,7 +154,6 @@ Ball *newBall(Ball *list)
     new_ball->bordercolor.r = 255;
     new_ball->bordercolor.g = 255;
     new_ball->bordercolor.b = 255;
-    new_ball->active = 1;
     new_ball->next = nullptr;
     if (list != nullptr)
     {
@@ -155,51 +182,92 @@ void handleEvent(Ball **balls)
     SDL_Event e;
     while (SDL_PollEvent(&e))
     {
-
-    }
-    Ball *previous = nullptr;
-    Ball *current = *balls;
-    // Condition de clic
-    if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(1))
-    { // lors d'un clic
-        // Capture les positions du curseur à l'instant du clic
-        bool clickedonball = false;
-        SDL_GetMouseState(&xMouse, &yMouse);
-        while (current != nullptr)
-        {
-            
-            // for (int i = 0; i<nbBalles;i++){
-
-            // // Au lieu de prendre simplement la position, on divise les valeurs par le rayon pour pouvoir cliquer sur une balle en cliquant sur n'importe quel endroit de sa surface
-            // int yMouseDividedByRadius = yMouse / balles[i].radius.y;
-            // int xMouseDividedByRadius = xMouse / balles[i].radius.x;
-            // int yBallPositionDividedByRadius = balles[i].position.y / balles[i].radius.y;
-            // int xBallPositionDividedByRadius = balles[i].position.x / balles[i].radius.x;
-
-            if (yMouse > current->position.y - current->radius.y && yMouse < current->position.y + current->radius.y && xMouse > current->position.x - current->radius.x && xMouse < current->position.x + current->radius.x)
+        Ball *previous = nullptr;
+        Ball *current = *balls;
+        // Condition de clic
+        if (e.type == SDL_MOUSEBUTTONDOWN)
+        { // lors d'un clic
+            // Capture les positions du curseur à l'instant du clic
+            bool clickedonball = false;
+            SDL_GetMouseState(&xMouse, &yMouse);
+            while (current != nullptr)
             {
-               //L'utilisateur a cliqué sur la balle
-                clickedonball = true;
-                if (previous == nullptr) {
-                    *balls = current->next;
-                } else if (find_last(*balls) == current) {
+                
+                // for (int i = 0; i<nbBalles;i++){
 
-                    previous->next = nullptr;
-                } else {
-                    previous->next = current->next;
-                }
-                break;
-            } 
-            // }
-            previous = current;
-            current = current->next;
-        }
-        // Si l'utilisateur n'a pas cliqué sur la balle, on crée une nouvelle balle
-        bool ballspawned = false;
-        if (clickedonball == false && ballspawned == false) {
-            *balls = newBall(*balls);
+                // // Au lieu de prendre simplement la position, on divise les valeurs par le rayon pour pouvoir cliquer sur une balle en cliquant sur n'importe quel endroit de sa surface
+                // int yMouseDividedByRadius = yMouse / balles[i].radius.y;
+                // int xMouseDividedByRadius = xMouse / balles[i].radius.x;
+                // int yBallPositionDividedByRadius = balles[i].position.y / balles[i].radius.y;
+                // int xBallPositionDividedByRadius = balles[i].position.x / balles[i].radius.x;
+
+                if (yMouse > current->position.y - current->radius.y && yMouse < current->position.y + current->radius.y && xMouse > current->position.x - current->radius.x && xMouse < current->position.x + current->radius.x)
+                {
+                //L'utilisateur a cliqué sur la balle
+                    clickedonball = true;
+                    if (previous == nullptr) {
+                        *balls = current->next;
+                    } else if (find_last(*balls) == current) {
+
+                        previous->next = nullptr;
+                    } else {
+                        previous->next = current->next;
+                    }
+                    break;
+                } 
+                // }
+                previous = current;
+                current = current->next;
+            }
+            // Si l'utilisateur n'a pas cliqué sur la balle, on crée une nouvelle balle
+            if (clickedonball == false) {
+                *balls = newBallWithPos(*balls, xMouse, yMouse);
+            }
         }
     }
+    // Ball *previous = nullptr;
+    // Ball *current = *balls;
+    // // Condition de clic
+    // if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(1))
+    // { // lors d'un clic
+    //     // Capture les positions du curseur à l'instant du clic
+    //     bool clickedonball = false;
+    //     SDL_GetMouseState(&xMouse, &yMouse);
+    //     while (current != nullptr)
+    //     {
+            
+    //         // for (int i = 0; i<nbBalles;i++){
+
+    //         // // Au lieu de prendre simplement la position, on divise les valeurs par le rayon pour pouvoir cliquer sur une balle en cliquant sur n'importe quel endroit de sa surface
+    //         // int yMouseDividedByRadius = yMouse / balles[i].radius.y;
+    //         // int xMouseDividedByRadius = xMouse / balles[i].radius.x;
+    //         // int yBallPositionDividedByRadius = balles[i].position.y / balles[i].radius.y;
+    //         // int xBallPositionDividedByRadius = balles[i].position.x / balles[i].radius.x;
+
+    //         if (yMouse > current->position.y - current->radius.y && yMouse < current->position.y + current->radius.y && xMouse > current->position.x - current->radius.x && xMouse < current->position.x + current->radius.x)
+    //         {
+    //            //L'utilisateur a cliqué sur la balle
+    //             clickedonball = true;
+    //             if (previous == nullptr) {
+    //                 *balls = current->next;
+    //             } else if (find_last(*balls) == current) {
+
+    //                 previous->next = nullptr;
+    //             } else {
+    //                 previous->next = current->next;
+    //             }
+    //             break;
+    //         } 
+    //         // }
+    //         previous = current;
+    //         current = current->next;
+    //     }
+    //     // Si l'utilisateur n'a pas cliqué sur la balle, on crée une nouvelle balle
+    //     bool ballspawned = false;
+    //     if (clickedonball == false && ballspawned == false) {
+    //         *balls = newBall(*balls);
+    //     }
+    // }
 }
 
 void moveBalls(Ball *balls, Wall wall)
@@ -263,7 +331,7 @@ int main(int argc, char **argv)
     for (int i = 0; i < nbBalles; i++)
     {
         // Ball balls;
-        // balls.writeBall(randomNumber(30, 690), randomNumber(30, 410), randomNumber(1, 7), randomNumber(1, 7), randomNumber(10, 20), 110, 150, 30, 255, 255, 255, 1);
+        // balls.writeBall(randomNumber(30, 690), randomNumber(30, 410), randomNumber(1, 7), randomNumber(1, 7), randomNumber(10, 20), 110, 150, 30, 255, 255, 255);
         balls = newBall(balls);
         // balles[i] = balle;
     }

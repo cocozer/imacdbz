@@ -52,7 +52,7 @@ typedef struct Ball {
 
     bool active;
     // Assignation des valeurs dans l'objet crée
-    void writeBall(int x, int y, int vx, int vy, int rayon, unsigned int r, unsigned int g, unsigned int b, unsigned int br, unsigned int bg, unsigned int bb, bool active);
+    void writeBall(int x, int y, int vx, int vy, int rayon, unsigned int r, unsigned int g, unsigned int b, unsigned int br, unsigned int bg, unsigned int bb);
     // On ajoute une nouvelle balle à la liste chainée
     // On dessine les balles à l'endroit où elles sont à l'instant T
     void draw(SDL_Renderer* renderer);
@@ -64,6 +64,7 @@ typedef struct Ball {
 } Ball;
 //Création d'une nouvelle balle et ajout dans la liste chainée
 Ball *newBall(Ball *list);
+Ball *newBallWithPos(Ball *list, int x, int y);
 void handleEvent(Ball *balls);
 Ball *find_last(Ball *list);
 
