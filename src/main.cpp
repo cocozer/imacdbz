@@ -152,6 +152,11 @@ void handleEvent(Ball *balls)
     /* Définition des variables de position de curseur */
     int xMouse;
     int yMouse;
+    SDL_Event e;
+    while (SDL_PollEvent(&e))
+    {
+
+    }
     // Condition de clic
     if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(1))
     { // lors d'un clic
