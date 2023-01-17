@@ -42,6 +42,14 @@ struct Wall {
 
     void writeWall(int x1, int y1, int x2, int y2);
 };
+struct internWall {
+    bool horizontal;
+    int taille;
+    Vector2 position;
+    
+    void draw(SDL_Renderer *renderer);
+    void writeInternWall(bool horizontal, int taille, Vector2 position);
+};
 typedef struct Ball {
     Vector2 position;
     Vector2 velocity;
@@ -60,6 +68,7 @@ typedef struct Ball {
     void updatePosition();
     // On vérifie si la balle touche les murs, si oui, on la fait changer de sens
     void checkWalls(Wall wall);
+    void checkBalls(Ball *balls);
 
 } Ball;
 //Création d'une nouvelle balle et ajout dans la liste chainée

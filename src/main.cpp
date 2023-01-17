@@ -6,10 +6,10 @@
 using namespace std;
 // Fonctions
 
-int randomNumber(int min, int max)
-{
-    return min + (rand() % max);
-}
+    int randomNumber(int min, int max)
+    {
+        return min + (rand() % max);
+    }
 // STRUCT VECTOR 2 FONCTIONS
 
 int Vector2::returnx()
@@ -59,6 +59,20 @@ void Wall::writeWall(int x1, int y1, int x2, int y2)
     this->y1 = y1;
     this->y2 = y2;
 }
+
+void internWall::writeInternWall(bool horizontal, int taille, Vector2 position)
+{
+    this->horizontal = horizontal;
+    this->taille = taille;
+    this->position = position;
+}
+void internWall::draw(SDL_Renderer *renderer) {
+    if (this->horizontal == true) {
+        hlineRGBA(renderer, this->position.x, this->position.x+this->taille, this->position.y, 255, 255, 255, 255);
+    } else {
+        vlineRGBA(renderer, this->position.x, this->position.y, this->position.y+this->taille, 255, 255, 255, 255);
+    }
+}
 // STRUCT BALL FONCTIONS
 void Ball::writeBall(int x, int y, int vx, int vy, int rayon, unsigned int r, unsigned int g, unsigned int b, unsigned int br, unsigned int bg, unsigned int bb)
 {
@@ -102,6 +116,32 @@ void Ball::checkWalls(Wall wall)
     else if (this->position.y + this->radius.y >= wall.y2)
     {
         this->velocity.y = -this->velocity.y;
+    }
+}
+void Ball::checkBalls(Ball *balls)
+{
+    // On parcourt toutes les balles
+    Ball *otherball = balls;
+    while (otherball != nullptr) {
+        // On vérifie que la balle du parcourt n'est pas la balle du this
+        if (otherball != this) {
+            // On calcule la différence en x et en y entre la balle du this et la balle du parcourt
+            int xDiff = otherball->position.x - this->position.x;
+            int yDiff = otherball->position.y - this->position.y;
+            // On calcule la distance entre les deux balles
+            int distance = sqrt((xDiff * xDiff) + (yDiff * yDiff));
+            // Si la distance entre les deux balles est plus grande que les deux rayons des balles additionnés (si elles se touchent)
+            if (distance <= otherball->radius.x + this->radius.x) {
+                // On inverse leurs vitesses 
+                int otherballX = otherball->velocity.x;
+                int otherballY = otherball->velocity.y;
+                otherball->velocity.x = this->velocity.x;
+                otherball->velocity.y = this->velocity.y;
+                this->velocity.x = otherballX;
+                this->velocity.y = otherballY;
+            }
+        }
+        otherball = otherball->next;
     }
 }
 Ball *newBallWithPos(Ball *list, int x, int y) {
@@ -336,6 +376,7 @@ void moveBalls(Ball *balls, Wall wall)
     Ball *current = balls;
     while (current != nullptr)
     {
+        current->checkBalls(balls);
         current->checkWalls(wall);
         current->updatePosition();
         current = current->next;
@@ -395,14 +436,13 @@ int main(int argc, char **argv)
             nbBalles = arg;
         }
     } else if (argc > 2) {
-        for (int i = 1; i < argc; i++){
+        for (int i = 1; i+1 < argc; i++){
             int r;
             int g;
             int b;
             sscanf(argv[i], "%d,%d,%d", &r, &g, &b);
-            balls = newBallWithColor(balls, r, g, b);
+            balls = newBallWithColor(balls,r, g, b);
         }
-        nbBalles = 0;
     }
 
     for (int i = 0; i < nbBalles; i++)
@@ -413,6 +453,27 @@ int main(int argc, char **argv)
     // Initialisations des murs
     Wall wall;
     wall.writeWall(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    // Initialisation des murs internes
+    internWall walls[3];
+    int nbInternWalls = 3;
+    
+    for (int i = 0; i<nbInternWalls;i++) {
+        internWall wall;
+        Vector2 posmur;
+        posmur.x = randomNumber(0, SCREEN_WIDTH);
+        posmur.y = randomNumber(0, SCREEN_HEIGHT);
+        int taille = randomNumber(50, 1000);
+        bool horizontal;
+        if (randomNumber(1, 2) == 1) {
+            horizontal = true;
+        } else {
+            horizontal = false;
+        }
+        wall.writeInternWall(horizontal, taille, posmur);
+        walls[i] = wall;
+        wall.draw(renderer);
+    }
     /*  GAME LOOP  */
 
     while (true)
