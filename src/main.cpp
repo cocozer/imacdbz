@@ -353,7 +353,7 @@ void moveBalls(Ball *balls, Wall wall)
     }
 }
 // Fonction qui dessine toutes les balles
-void draw(Ball *balls, SDL_Renderer *renderer)
+void draw(Ball *balls, SDL_Renderer *renderer, internWall walls[], int nbrwall)
 {
     // On parcourt toutes les balles et on les dessine toutes
     while (balls->next != nullptr)
@@ -362,6 +362,11 @@ void draw(Ball *balls, SDL_Renderer *renderer)
         balls = balls->next;
     }
     balls->draw(renderer);
+
+    // On déssine les murs
+    for (int i = 0; i<nbrwall;i++) {
+        walls[i].draw(renderer);
+    }
 }
 // Je vous présente la fonction main Ô_Ô
 int main(int argc, char **argv) {
@@ -407,11 +412,11 @@ int main(int argc, char **argv) {
     wall.writeWall(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT); // on met le mur autour de la fenêtre
 
     // Initialisation des murs internes
-    internWall walls[3];
     int nbInternWalls = 3;
+    internWall walls[nbInternWalls];
     
     for (int i = 0; i<nbInternWalls;i++) {
-        internWall wall;
+        internWall wallIntern;
         Vector2 posmur;
         posmur.x = randomNumber(0, SCREEN_WIDTH);
         posmur.y = randomNumber(0, SCREEN_HEIGHT);
@@ -422,9 +427,9 @@ int main(int argc, char **argv) {
         } else {
             horizontal = false;
         }
-        wall.writeInternWall(horizontal, taille, posmur);
-        walls[i] = wall;
-        wall.draw(renderer);
+        wallIntern.writeInternWall(horizontal, taille, posmur);
+        walls[i] = wallIntern;
+        wallIntern.draw(renderer);
     }
     /*  GAME LOOP  */
 
@@ -446,9 +451,10 @@ int main(int argc, char **argv) {
         SDL_RenderClear(renderer);
 
         // DESSIN
-        draw(balls, renderer);
+        draw(balls, renderer, &walls[nbInternWalls],nbInternWalls);
+        
 
-        // VALIDATION FRAME
+        // VALIDATION FRAM
         SDL_RenderPresent(renderer);
 
         // PAUSE en ms

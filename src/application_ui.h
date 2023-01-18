@@ -79,6 +79,6 @@ void handleEvent(Ball *balls);
 Ball *find_last(Ball *list);
 
 void moveBalls(Ball *Balls, Wall wall);
-void draw(Ball *Balls, SDL_Renderer* renderer);
+void draw(Ball *Balls, SDL_Renderer* renderer, internWall walls[], int nbrwall);
 #endif
 
