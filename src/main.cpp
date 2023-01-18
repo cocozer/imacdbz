@@ -110,22 +110,51 @@ void Ball::updatePosition()
 void Ball::checkWalls(Wall wall)
 {
 
-    // Si la balle touche un bord, sa vitesse dans l'axe concerné est inversée
+    // Si la balle touche un bord, sa vitesse dans l'axe concerné est dirigée vers l'intérieur du cadre
     if (this->position.x - this->radius.x <= wall.x1)
     {
-        this->velocity.x = -this->velocity.x;
+        this->velocity.x = abs(this->velocity.x);
     }
     else if (this->position.y - this->radius.y <= wall.y1)
     {
-        this->velocity.y = -this->velocity.y;
+        this->velocity.y = abs(this->velocity.y);
     }
     else if (this->position.x + this->radius.x >= wall.x2)
     {
-        this->velocity.x = -this->velocity.x;
+        this->velocity.x = -abs(this->velocity.x);
     }
     else if (this->position.y + this->radius.y >= wall.y2)
     {
-        this->velocity.y = -this->velocity.y;
+        this->velocity.y = -abs(this->velocity.y);
+    }
+}
+// Fonction qui vérifie qu'une balle touche un mur interne
+void Ball::checkInternWalls(internWall walls[], int nbInternWalls)
+{
+    // On parcourt le tableau de murs
+    for(int i = 0; i<nbInternWalls; i++) {
+        // Si le mur est horizontal
+        if(walls[i].horizontal) {
+            // Si la balle est sur le même axe y que le mur
+            if(this->position.y - this->radius.y <= walls[i].position.y && this->position.y + this->radius.y >= walls[i].position.y) {
+                // Si la balle a son axe x qui rentre dans le périmètre du mur
+                if(this->position.x - this->radius.x <= walls[i].position.x + walls[i].taille && this->position.x + this->radius.x >= walls[i].position.x) {
+                    // Ici, la balle rentre en collision avec le mur horizontal
+                    // On inverse son axe y
+                    this->velocity.y = -(this->velocity.y);
+                }
+            }
+        } else { // Si le mur est vertical
+            // Si la balle est sur le même axe y que le mur
+            if(this->position.x - this->radius.x <= walls[i].position.x && this->position.x + this->radius.x >= walls[i].position.x) {
+                // Si la balle a son axe y qui rentre dans le périmètre du mur
+                if(this->position.y - this->radius.y <= walls[i].position.y + walls[i].taille && this->position.y + this->radius.y >= walls[i].position.y) {
+                    // Ici, la balle rentre en collision avec le mur horizontal
+                    // On inverse son axe x
+                    this->velocity.x = -(this->velocity.x);
+                }
+            }
+        }
     }
 }
 // Fonction qui vérifie si une balle heurte une autre balle. Si c'est le cas, on échange les vitesses des deux balles pour les faire rebondir entre elles
@@ -340,7 +369,7 @@ void handleEvent(Ball **balls)
     }
 }
 // Fonction qui fait bouger les balles
-void moveBalls(Ball *balls, Wall wall)
+void moveBalls(Ball *balls, Wall wall, internWall internWalls[], int nbInternWalls)
 {
     // On parcourt toutes les balles.
     Ball *current = balls;
@@ -348,11 +377,12 @@ void moveBalls(Ball *balls, Wall wall)
     {
         current->checkBalls(balls); // On vérifie si la balle touche une balle, si oui la fonction fait rebondir les balles entre elles
         current->checkWalls(wall); // On vérifie si la balle touche un mur extérieur, si oui la fonction fait rebondir la balle sur l'axe touché
+        current->checkInternWalls(&internWalls[nbInternWalls], nbInternWalls);
         current->updatePosition(); // On fait bouger la balle vers l'endroit où elle est dirigée à la vitesse qui lui est assignée
         current = current->next;
     }
 }
-// Fonction qui dessine toutes les balles
+// Fonction qui dessine toutes les balles et les murs
 void draw(Ball *balls, SDL_Renderer *renderer, internWall walls[], int nbrwall)
 {
     // On parcourt toutes les balles et on les dessine toutes
@@ -364,7 +394,7 @@ void draw(Ball *balls, SDL_Renderer *renderer, internWall walls[], int nbrwall)
     balls->draw(renderer);
 
     // On déssine les murs
-    for (int i = 0; i<nbrwall;i++) {
+    for (int i = 0; i<nbrwall+1;i++) {
         walls[i].draw(renderer);
     }
 }
@@ -412,15 +442,15 @@ int main(int argc, char **argv) {
     wall.writeWall(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT); // on met le mur autour de la fenêtre
 
     // Initialisation des murs internes
-    int nbInternWalls = 3;
-    internWall walls[nbInternWalls];
+    int nbInternWalls = 7;
+    internWall walls[7];
     
     for (int i = 0; i<nbInternWalls;i++) {
         internWall wallIntern;
         Vector2 posmur;
-        posmur.x = randomNumber(0, SCREEN_WIDTH);
-        posmur.y = randomNumber(0, SCREEN_HEIGHT);
-        int taille = randomNumber(50, 1000);
+        posmur.x = randomNumber(150, SCREEN_WIDTH-150);
+        posmur.y = randomNumber(150, SCREEN_HEIGHT-150);
+        int taille = randomNumber(250, 1000);
         bool horizontal;
         if (randomNumber(1, 2) == 1) {
             horizontal = true;
@@ -429,7 +459,7 @@ int main(int argc, char **argv) {
         }
         wallIntern.writeInternWall(horizontal, taille, posmur);
         walls[i] = wallIntern;
-        wallIntern.draw(renderer);
+        walls[i].draw(renderer);
     }
     /*  GAME LOOP  */
 
@@ -443,7 +473,7 @@ int main(int argc, char **argv) {
         }
         handleEvent(&balls);
         // GESTION ACTEURS
-        moveBalls(balls, wall);
+        moveBalls(balls, wall, &walls[nbInternWalls], nbInternWalls);
         // ...
 
         // EFFACAGE FRAME

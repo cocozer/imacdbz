@@ -69,6 +69,7 @@ typedef struct Ball {
     // On vérifie si la balle touche les murs, si oui, on la fait changer de sens
     void checkWalls(Wall wall);
     void checkBalls(Ball *balls);
+    void checkInternWalls(internWall walls[], int nbInternWalls);
 
 } Ball;
 //Création d'une nouvelle balle et ajout dans la liste chainée
@@ -78,7 +79,7 @@ Ball *newBallWithColor(Ball *list, int r, int g, int b);
 void handleEvent(Ball *balls);
 Ball *find_last(Ball *list);
 
-void moveBalls(Ball *Balls, Wall wall);
+void moveBalls(Ball *Balls, Wall wall, internWall internWalls[], int nbInternWalls);
 void draw(Ball *Balls, SDL_Renderer* renderer, internWall walls[], int nbrwall);
 #endif
 
