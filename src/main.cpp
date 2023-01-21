@@ -75,6 +75,7 @@ void internWall::draw(SDL_Renderer *renderer) {
 
     //Si le mur est horizontal, on appelle la fonction qui dessine une ligne horizontale
     if (this->horizontal == true) {
+        hlineRGBA(renderer, this->position.x, this->position.x+this->taille, this->position.y, 255, 255, 255, 255);
     } else { // Sinon, on appelle celle de la ligne verticale
         vlineRGBA(renderer, this->position.x, this->position.y, this->position.y+this->taille, 255, 255, 255, 255);
     }
