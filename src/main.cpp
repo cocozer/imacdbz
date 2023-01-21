@@ -75,7 +75,6 @@ void internWall::draw(SDL_Renderer *renderer) {
 
     //Si le mur est horizontal, on appelle la fonction qui dessine une ligne horizontale
     if (this->horizontal == true) {
-        hlineRGBA(renderer, this->position.x, this->position.x+this->taille, this->position.y, 255, 255, 255, 255);
     } else { // Sinon, on appelle celle de la ligne verticale
         vlineRGBA(renderer, this->position.x, this->position.y, this->position.y+this->taille, 255, 255, 255, 255);
     }
@@ -377,7 +376,7 @@ void moveBalls(Ball *balls, Wall wall, internWall internWalls[], int nbInternWal
     {
         current->checkBalls(balls); // On vérifie si la balle touche une balle, si oui la fonction fait rebondir les balles entre elles
         current->checkWalls(wall); // On vérifie si la balle touche un mur extérieur, si oui la fonction fait rebondir la balle sur l'axe touché
-        current->checkInternWalls(&internWalls[nbInternWalls], nbInternWalls);
+        current->checkInternWalls(internWalls, nbInternWalls);
         current->updatePosition(); // On fait bouger la balle vers l'endroit où elle est dirigée à la vitesse qui lui est assignée
         current = current->next;
     }
@@ -394,7 +393,7 @@ void draw(Ball *balls, SDL_Renderer *renderer, internWall walls[], int nbrwall)
     balls->draw(renderer);
 
     // On déssine les murs
-    for (int i = 0; i<nbrwall+1;i++) {
+    for (int i = 0; i<nbrwall;i++) {
         walls[i].draw(renderer);
     }
 }
@@ -405,7 +404,7 @@ int main(int argc, char **argv) {
     bool is_running = true;
 
     // Creation de la fenetre
-    gWindow = init("dbzimac (attrape toutes les boules de cristal)");
+    gWindow = init("dbzimac (attrape toutes les planètes)");
 
     if (!gWindow)
     {
@@ -444,23 +443,28 @@ int main(int argc, char **argv) {
     // Initialisation des murs internes
     int nbInternWalls = 7;
     internWall walls[7];
-    
-    for (int i = 0; i<nbInternWalls;i++) {
+
+     for (int i = 0; i<nbInternWalls;i++) {
         internWall wallIntern;
         Vector2 posmur;
         posmur.x = randomNumber(150, SCREEN_WIDTH-150);
         posmur.y = randomNumber(150, SCREEN_HEIGHT-150);
         int taille = randomNumber(250, 1000);
         bool horizontal;
+        // On choisit aléatoirement si le mur sera horizontal ou vertical
         if (randomNumber(1, 2) == 1) {
             horizontal = true;
         } else {
             horizontal = false;
         }
+        // on écrit les valeurs dans la variable du mur de structure internWall
         wallIntern.writeInternWall(horizontal, taille, posmur);
+        // on assigne le mur au tableau
         walls[i] = wallIntern;
-        walls[i].draw(renderer);
     }
+
+
+
     /*  GAME LOOP  */
 
     while (true)
@@ -473,7 +477,7 @@ int main(int argc, char **argv) {
         }
         handleEvent(&balls);
         // GESTION ACTEURS
-        moveBalls(balls, wall, &walls[nbInternWalls], nbInternWalls);
+        moveBalls(balls, wall, walls, nbInternWalls);
         // ...
 
         // EFFACAGE FRAME
@@ -481,8 +485,7 @@ int main(int argc, char **argv) {
         SDL_RenderClear(renderer);
 
         // DESSIN
-        draw(balls, renderer, &walls[nbInternWalls],nbInternWalls);
-        
+        draw(balls, renderer, walls,nbInternWalls);
 
         // VALIDATION FRAM
         SDL_RenderPresent(renderer);

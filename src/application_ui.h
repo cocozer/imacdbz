@@ -50,6 +50,8 @@ struct internWall {
     void draw(SDL_Renderer *renderer);
     void writeInternWall(bool horizontal, int taille, Vector2 position);
 };
+
+
 typedef struct Ball {
     Vector2 position;
     Vector2 velocity;
